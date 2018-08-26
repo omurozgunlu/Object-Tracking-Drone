@@ -31,7 +31,7 @@ if __name__ == '__main__':
     drawing = False
     event_params = {"top_left_pt": (-1, -1), "bottom_right_pt": (-1, -1)}
     selected=False
-	video_path='Video path here'
+    video_path='Video path here'
     cap = cv2.VideoCapture(video_path)
     tracker=cv2.TrackerMIL_create()
     initialized=False
