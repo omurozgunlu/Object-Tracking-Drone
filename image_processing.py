@@ -32,7 +32,7 @@ if __name__ == '__main__':
     event_params = {"top_left_pt": (-1, -1), "bottom_right_pt": (-1, -1)}
     selected=False
 
-    cap = cv2.VideoCapture("sokak.mp4")
+    cap = cv2.VideoCapture(0)
     tracker=cv2.TrackerMOSSE_create()
     initialized=False 
     bbox1=[]
