@@ -1,5 +1,7 @@
 import cv2
-
+import numpy as np
+import time
+import pickle
 
 
 def update_pts(params, x, y):
@@ -32,9 +34,10 @@ if __name__ == '__main__':
     event_params = {"top_left_pt": (-1, -1), "bottom_right_pt": (-1, -1)}
     selected=False
 
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture('http://192.168.1.21:8080/video')
     tracker=cv2.TrackerMOSSE_create()
-    initialized=False 
+    #csrt,kcf,mil,mosse
+    initialized=False
     bbox1=[]
 
 
@@ -53,19 +56,23 @@ if __name__ == '__main__':
    
     width=cap.get(cv2.CAP_PROP_FRAME_WIDTH)
     height=cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
-    
+    orta_x=int(width/2)
+    orta_y=int(height/2)
     
 
     bbox=()
-    axy=[160,120]
-    file_output='video111.avi'
+    axy=[orta_x,orta_y]
+    file_output='xdxd.avi'
     fourcc=cv2.VideoWriter_fourcc(*'FMP4')
     out=cv2.VideoWriter(file_output,fourcc,20.0,(int(width),int(height)))
-    
+    fp=open("pay1.pkl","wb")
+    pickle.dump(axy,fp,protocol=2)
+    fp.close()
 
 
     while True:
         ok, frame = cap.read()
+        frame=cv2.flip(frame,-1)
         #print 'okuma basladi'
         img = cv2.resize(frame, None, fx=1, fy=1, interpolation=cv2.INTER_AREA)
         
@@ -90,16 +97,24 @@ if __name__ == '__main__':
             p1=(int(bbox[0]),int(bbox[1]))
             p2 = (int(bbox[0] + bbox[2]), int(bbox[1] + bbox[3]))
             cv2.rectangle(img,p1,p2,(255,0,0),2,1)
+            a_x=int(2*bbox[0]+bbox[2])/2
+            a_y=int(2*bbox[1]+bbox[3])/2
+            axy=[a_x,a_y]
+            cv2.arrowedLine(img, (320, 480), (int(a_x),int(a_y)), (255, 255, 255), 2)
             
         else:
             cv2.putText(img, "Tracking failure detected", (100, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75,
                                     (0, 0, 255), 2)
+            axy=[orta_x,orta_y]
         
-        a_x=int(2*bbox[0]+bbox[2])/2
-        a_y=int(2*bbox[1]+bbox[3])/2
-        axy=[a_x,a_y]
-        
-        cv2.arrowedLine(img, (160, 239), (a_x,a_y), (255, 255, 255), 2)
+        #a_x=int(2*bbox[0]+bbox[2])/2
+        #a_y=int(2*bbox[1]+bbox[3])/2
+        #axy=[a_x,a_y]
+        print (axy)
+        fp=open("pay1.pkl","wb")
+        pickle.dump(axy,fp,protocol=2)
+        fp.close()
+        #cv2.arrowedLine(img, (320, 480), (int(a_x),int(a_y)), (255, 255, 255), 2)
         out.write(img)
         
                        
@@ -107,8 +122,15 @@ if __name__ == '__main__':
         
         c = cv2.waitKey(5)
         if c == 27:
+            axy=[orta_x,orta_y]
+            fp=open("pay1.pkl","wb")
+            pickle.dump(axy,fp,protocol=2)
+            fp.close()
+            print(axy)
+            time.sleep(0.5)
             break
-        
+        #print(orta_x)
+        #print(orta_y)
 
     
     cap.release()
